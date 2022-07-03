@@ -1,0 +1,19 @@
+{
+  "sampling_frequency": 25000,
+  "signal_duration": 155,
+  "group": "ET1",
+  "subject": "R21-15",
+  "conditions": ["PreLesion_Mapping", "PostLesion_Mapping"],
+  "areas": {
+    "P1": {
+      "label": "RFA",
+      "name": "Rostral Forelimb Area",
+      "stimulated": false
+    },
+    "P2": {
+      "label": "S1",
+      "name": "Primary Somatosensory Area",
+      "stimulated": true
+    }
+  }
+}
