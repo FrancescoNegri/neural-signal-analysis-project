@@ -3,7 +3,6 @@ import os
 import shutil
 import h5py
 import numpy as np
-from scipy.signal import find_peaks
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 import neurospyke as ns
