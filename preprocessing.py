@@ -13,15 +13,22 @@ settings = json.load(f)
 f.close()
 
 sampling_frequency = settings['sampling_frequency']
-sampling_time = 1/sampling_frequency
+sampling_time = 1 / sampling_frequency
+resampling_frequency = settings['resampling_frequency']
+resampling_time = 1 / resampling_frequency
 signal_duration = settings['signal_duration']
+trial_duration = settings['trial_duration']
 
 group = settings['group']
 subject = settings['subject']
 conditions = settings['conditions']
-areas = settings['areas'].keys()
+areas = list(settings['areas'].keys())
+n_channels = settings['n_channels']
+n_stimuli = settings['n_stimuli']
 
 output_path = './output'
+preprocessed_data = np.ndarray([np.size(conditions), np.size(areas), n_channels, n_stimuli, trial_duration * resampling_frequency])
+print(np.shape(preprocessed_data))
 
 def get_raw_data_paths(group, subject, conditions, areas):
     subject_path = os.path.join('./data', group, subject)
@@ -53,12 +60,12 @@ for condition in tqdm(conditions, desc='Conditions'):
             data = f['data'][:]
             data = np.reshape(data, np.size(data))
             data = data[np.arange(0, signal_duration * sampling_frequency)]
-            ns.visualization.plot_raw_data(data, sampling_time=sampling_time, dpi=100)
-            plt.savefig(os.path.join(output_path, str(channel) + 'a.png'))
-            plt.close()
+            # ns.visualization.plot_raw_data(data, sampling_time=sampling_time, dpi=100)
+            # plt.savefig(os.path.join(output_path, str(channel) + 'a.png'))
+            # plt.close()
 
             data, stimulus_idxs = preprocessing.run_SALPA(data, sampling_time)
 
-            ns.visualization.plot_spikes(data, stimulus_idxs, sampling_time=sampling_time, dpi=100)
-            plt.savefig(os.path.join(output_path, str(channel) + 'z.png'))
-            plt.close()
+            # ns.visualization.plot_spikes(data, stimulus_idxs, sampling_time=sampling_time, dpi=100)
+            # plt.savefig(os.path.join(output_path, str(channel) + 'z.png'))
+            # plt.close()
