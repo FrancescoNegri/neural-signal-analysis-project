@@ -22,8 +22,6 @@ conditions = settings['conditions']
 areas = settings['areas'].keys()
 
 output_path = './output'
-condition = conditions[0]
-area = 'P2'
 
 def get_raw_data_paths(group, subject, conditions, areas):
     subject_path = os.path.join('./data', group, subject)
@@ -39,27 +37,28 @@ def get_raw_data_paths(group, subject, conditions, areas):
 raw_data_paths = get_raw_data_paths(group, subject, conditions, areas)
 
 if not os.path.isdir(output_path):
-    # shutil.rmtree(output_path)
     os.makedirs(output_path)
 
-output_path = os.path.join(output_path, subject, condition, area)
-if os.path.isdir(output_path):
-    shutil.rmtree(output_path)
+for condition in tqdm(conditions, desc='Conditions'):
+    for area in tqdm(areas, desc='Brain Areas', leave=False):
+        output_path = os.path.join(output_path, subject, condition, area)
+        if os.path.isdir(output_path):
+            shutil.rmtree(output_path)
 
-os.makedirs(output_path)
+        os.makedirs(output_path)
 
-for path in tqdm(raw_data_paths[condition][area]):
-    channel = int(path.split('\\')[-1].split('_Ch_')[-1].split('.mat')[0])
-    f = h5py.File(path)
-    data = f['data'][:]
-    data = np.reshape(data, np.size(data))
-    data = data[np.arange(0, signal_duration * sampling_frequency)]
-    ns.visualization.plot_raw_data(data, sampling_time=sampling_time, dpi=40)
-    plt.savefig(os.path.join(output_path, str(channel) + 'a.png'))
-    plt.close()
+        for path in tqdm(raw_data_paths[condition][area], desc='Channels', leave=False):
+            channel = int(path.split('\\')[-1].split('_Ch_')[-1].split('.mat')[0])
+            f = h5py.File(path)
+            data = f['data'][:]
+            data = np.reshape(data, np.size(data))
+            data = data[np.arange(0, signal_duration * sampling_frequency)]
+            ns.visualization.plot_raw_data(data, sampling_time=sampling_time, dpi=100)
+            plt.savefig(os.path.join(output_path, str(channel) + 'a.png'))
+            plt.close()
 
-    data, stimulus_idxs = preprocessing.run_SALPA(data, sampling_time)
+            data, stimulus_idxs = preprocessing.run_SALPA(data, sampling_time)
 
-    ns.visualization.plot_spikes(data, stimulus_idxs, sampling_time=sampling_time, dpi=40)
-    plt.savefig(os.path.join(output_path, str(channel) + 'z.png'))
-    plt.close()
+            ns.visualization.plot_spikes(data, stimulus_idxs, sampling_time=sampling_time, dpi=100)
+            plt.savefig(os.path.join(output_path, str(channel) + 'z.png'))
+            plt.close()

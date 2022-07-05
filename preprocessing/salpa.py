@@ -34,9 +34,11 @@ def run_SALPA(data, sampling_time, stimulus_samples = 100, transient_duration = 
     for stimulus_idx in stimulus_idxs:
         data[stimulus_idx + transient_range] = data[stimulus_idx + transient_range] - mean_transient_smoothed
 
-    remaining_stimulus_idxs, _ = find_peaks(np.abs(data), height=peaks_height, distance=peaks_distance * sampling_frequency)
-    if len(remaining_stimulus_idxs) > 0:
-        data, _ = run_SALPA(data, sampling_time, stimulus_samples, transient_duration, peaks_height, peaks_distance)
+    # TODO: fix this as suggested in the processing notebook!
+    
+    # remaining_stimulus_idxs, _ = find_peaks(np.abs(data), height=peaks_height, distance=peaks_distance * sampling_frequency)
+    # if len(remaining_stimulus_idxs) > 0:
+    #     data, _ = run_SALPA(data, sampling_time, stimulus_samples, transient_duration, peaks_height, peaks_distance)
 
     return data, stimulus_idxs
  
