@@ -26,7 +26,7 @@ areas = list(settings['areas'].keys())
 n_channels = settings['n_channels']
 n_stimuli = settings['n_stimuli']
 
-output_path = './output'
+output_dir = './output'
 preprocessed_data = np.ndarray([np.size(conditions), np.size(areas), n_channels, n_stimuli, trial_duration * resampling_frequency])
 print(np.shape(preprocessed_data))
 
@@ -43,12 +43,12 @@ def get_raw_data_paths(group, subject, conditions, areas):
    
 raw_data_paths = get_raw_data_paths(group, subject, conditions, areas)
 
-if not os.path.isdir(output_path):
-    os.makedirs(output_path)
+if not os.path.isdir(output_dir):
+    os.makedirs(output_dir)
 
 for condition in tqdm(conditions, desc='Conditions'):
     for area in tqdm(areas, desc='Brain Areas', leave=False):
-        output_path = os.path.join(output_path, subject, condition, area)
+        output_path = os.path.join(output_dir, group, subject, condition, area)
         if os.path.isdir(output_path):
             shutil.rmtree(output_path)
 
