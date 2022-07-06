@@ -1,11 +1,11 @@
-from turtle import st
 import numpy as np
-from scipy.signal import find_peaks, savgol_filter
+import neurospyke as ns
+from scipy.signal import savgol_filter
 
-def run_SALPA(data, sampling_time, stimulus_samples = 100, transient_duration = 0.7, peaks_height = 2000, peaks_distance = 4):
+def run_SALPA(data, sampling_time, stimulus_samples = 160, transient_duration = 0.7, peaks_height = 4000, peaks_distance = 4):
     sampling_frequency = 1 / sampling_time
     
-    stimulus_idxs, _ = find_peaks(np.abs(data), height=peaks_height, distance=peaks_distance * sampling_frequency)
+    stimulus_idxs, _ = ns.spikes.differential_threshold(data, threshold=peaks_height, window_length=stimulus_samples, refractory_period=peaks_distance * sampling_frequency)
 
     stimulus_half_samples = int(np.ceil(stimulus_samples / 2))
     stimulus_range = np.arange(-stimulus_half_samples, stimulus_half_samples)
