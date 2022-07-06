@@ -46,9 +46,14 @@ raw_data_paths = get_raw_data_paths(group, subject, conditions, areas)
 if not os.path.isdir(output_dir):
     os.makedirs(output_dir)
 
+output_dir = os.path.join(output_dir, group, subject)
+if os.path.isdir(output_dir):
+    shutil.rmtree(output_dir)
+os.makedirs(output_dir)
+
 for condition in tqdm(conditions, desc='Conditions'):
     for area in tqdm(areas, desc='Brain Areas', leave=False):
-        output_path = os.path.join(output_dir, group, subject, condition, area)
+        output_path = os.path.join(output_dir, condition, area)
         if os.path.isdir(output_path):
             shutil.rmtree(output_path)
 
