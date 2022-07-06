@@ -60,12 +60,14 @@ for condition in tqdm(conditions, desc='Conditions'):
             data = f['data'][:]
             data = np.reshape(data, np.size(data))
             data = data[np.arange(0, signal_duration * sampling_frequency)]
-            # ns.visualization.plot_raw_data(data, sampling_time=sampling_time, dpi=100)
-            # plt.savefig(os.path.join(output_path, str(channel) + 'a.png'))
-            # plt.close()
+            raw_data = np.copy(data)
 
             data, stimulus_idxs = preprocessing.run_SALPA(data, sampling_time)
 
-            # ns.visualization.plot_spikes(data, stimulus_idxs, sampling_time=sampling_time, dpi=100)
-            # plt.savefig(os.path.join(output_path, str(channel) + 'z.png'))
-            # plt.close()
+            ns.visualization.plot_spikes(raw_data, stimulus_idxs, sampling_time=sampling_time, title='Raw ' + str(len(stimulus_idxs)), dpi=200)
+            plt.savefig(os.path.join(output_path, str(channel) + 'a.png'))
+            plt.close()
+
+            ns.visualization.plot_spikes(data, stimulus_idxs, sampling_time=sampling_time, title='SALPA ' + str(len(stimulus_idxs)), dpi=200)
+            plt.savefig(os.path.join(output_path, str(channel) + 'z.png'))
+            plt.close()
