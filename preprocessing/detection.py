@@ -27,6 +27,8 @@ def get_stimulus_idxs_matrix(raw_data_paths, condition, settings):
             channel_stimulus_idxs, _ = ns.spikes.differential_threshold(data, threshold=4000, window_length=160, refractory_period=4*sampling_frequency)
 
             channel_idx = area_idx * n_channels + channel_path_idx
+            if np.size(channel_stimulus_idxs) > n_stimuli:
+                channel_stimulus_idxs = channel_stimulus_idxs[0:n_stimuli]
             stimulus_idxs_matrix[channel_idx, 0:np.size(channel_stimulus_idxs)] = channel_stimulus_idxs
 
     return stimulus_idxs_matrix
