@@ -1,12 +1,9 @@
 import numpy as np
-import neurospyke as ns
 from scipy.signal import savgol_filter
 
-def run_SALPA(data, sampling_time, stimulus_samples = 160, transient_duration = 0.7, peaks_height = 4000, peaks_distance = 4):
+def run_SALPA(data, stimulus_idxs, sampling_time, stimulus_samples = 160, transient_duration = 0.7):
     sampling_frequency = 1 / sampling_time
     
-    stimulus_idxs, _ = ns.spikes.differential_threshold(data, threshold=peaks_height, window_length=stimulus_samples, refractory_period=peaks_distance * sampling_frequency)
-
     stimulus_half_samples = int(np.ceil(stimulus_samples / 2))
     stimulus_range = np.arange(-stimulus_half_samples, stimulus_half_samples)
 
@@ -29,16 +26,10 @@ def run_SALPA(data, sampling_time, stimulus_samples = 160, transient_duration = 
         transients.append(data[stimulus_idx + transient_range])
 
     mean_transient = np.mean(transients, 0)
-    mean_transient_smoothed = savgol_filter(mean_transient, 1001, 3)
+    mean_transient_smoothed = savgol_filter(mean_transient, 2001, 2)
 
     for stimulus_idx in stimulus_idxs:
         data[stimulus_idx + transient_range] = data[stimulus_idx + transient_range] - mean_transient_smoothed
 
-    # TODO: fix this as suggested in the processing notebook!
-    
-    # remaining_stimulus_idxs, _ = find_peaks(np.abs(data), height=peaks_height, distance=peaks_distance * sampling_frequency)
-    # if len(remaining_stimulus_idxs) > 0:
-    #     data, _ = run_SALPA(data, sampling_time, stimulus_samples, transient_duration, peaks_height, peaks_distance)
-
-    return data, stimulus_idxs
+    return data
  
