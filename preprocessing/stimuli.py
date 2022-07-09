@@ -1,6 +1,7 @@
 import h5py
 import numpy as np
 import neurospyke as ns
+from scipy.signal import savgol_filter
 
 def get_stimulus_idxs_matrix(raw_data_paths, condition, settings):
     sampling_frequency = settings['sampling_frequency']
