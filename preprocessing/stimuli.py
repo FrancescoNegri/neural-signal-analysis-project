@@ -55,3 +55,40 @@ def get_median_stimulus_idxs(stimulus_idxs_matrix, tolerance_duration, settings)
 
     stimulus_idxs = stimulus_idxs.astype(np.int_)
     return stimulus_idxs
+
+def suppress_stimulus_artifacts(data, stimulus_idxs, sampling_time, stimulus_duration=0.002, transient_duration=0.75):
+    stimulus_samples = int(np.round(stimulus_duration / sampling_time))
+    stimulus_half_samples = int(np.ceil(stimulus_samples / 2))
+    stimulus_range = np.arange(-stimulus_half_samples, stimulus_half_samples)
+
+    transient_samples = int(np.ceil(transient_duration / sampling_time))
+    transient_range = np.arange(stimulus_half_samples, stimulus_half_samples + transient_samples)
+
+    for idx in np.arange(np.size(stimulus_idxs)):
+        stimulus_idx = stimulus_idxs[idx]
+        data[stimulus_idx + stimulus_range] = 0
+        transient = data[stimulus_idx + transient_range]
+
+        max_idx = np.argmax(transient)
+        # Ensure a meaningful max_idx, otherwhise set it null
+        max_idx = max_idx[0] if type(max_idx) == np.ndarray else max_idx
+        max_idx = 0 if max_idx < 100 else max_idx
+        max_idx = np.size(transient) if np.abs(np.size(transient) - max_idx) < 100 else max_idx
+
+        transient_smoothed = np.zeros(np.shape(transient))
+
+        if max_idx != 0:
+            left_transient_range = np.arange(stimulus_half_samples, stimulus_half_samples + max_idx) - stimulus_half_samples
+            window_length =  int(np.floor(np.size(left_transient_range) / 5) * 2 + 1) # force odd length
+            transient_smoothed[left_transient_range] = savgol_filter(transient[left_transient_range], window_length, 3)
+
+        if max_idx != np.size(transient):
+            right_transient_range = transient_range[max_idx:] - stimulus_half_samples
+            window_length =  int(np.floor(np.size(right_transient_range) / 5) * 2 + 1) # force odd length
+            transient_smoothed[right_transient_range] = savgol_filter(transient[right_transient_range], window_length, 3)
+
+        transient_smoothed = savgol_filter(transient_smoothed, 501, 3) # remove left-right discontinuity
+
+        data[stimulus_idx + transient_range] = data[stimulus_idx + transient_range] - transient_smoothed
+        
+    return data
