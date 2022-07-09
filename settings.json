@@ -3,6 +3,7 @@
   "resampling_frequency": 1000,
   "signal_duration": 155,
   "trial_duration": 4,
+  "trial_duration_view": 0.75,
   "group": "ET1",
   "subject": "R21-15",
   "conditions": ["PreLesion_Mapping", "PostLesion_Mapping"],
@@ -19,5 +20,6 @@
     }
   },
   "n_channels": 16,
-  "n_stimuli": 30
+  "n_stimuli": 30,
+  "n_PCA_components": 3
 }
