@@ -70,16 +70,16 @@ for condition_idx in tqdm(np.arange(np.size(conditions)), desc='Conditions'):
             data = np.reshape(data, np.size(data))
             data = data[np.arange(0, signal_duration * sampling_frequency)]
 
-            # Clean data by removing stimuli via SALPA
-            data = preprocessing.run_SALPA(data, stimulus_idxs, sampling_time)
+            # Clean data by suppressing stimulus artifacts
+            data = preprocessing.suppress_stimulus_artifacts(data, stimulus_idxs, sampling_time)
 
             # Apply a 300-7000 Hz band-pass filter
             num, den = butter(2, [300, 7000], btype='bandpass', fs=sampling_frequency)
             data = lfilter(num, den, data)
 
             # Spike Detection: Hard Threshold Local Maxima
-            threshold = 4*1.4824*median_abs_deviation(data)
-            spikes_idxs, _ = ns.spikes.hard_threshold_local_maxima(data, threshold, 0.001, use_abs=True, sampling_time=sampling_time)
+            threshold = 5*1.4824*median_abs_deviation(data)
+            spikes_idxs, _ = ns.spikes.hard_threshold_local_maxima(data, threshold, refractory_period=0.001, use_abs=True, sampling_time=sampling_time)
             
             # Get spike train and divide it in trials
             spike_train = ns.utils.convert_spikes_idxs_to_spike_train(spikes_idxs, sampling_time=sampling_time)
