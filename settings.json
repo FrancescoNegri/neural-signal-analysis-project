@@ -21,5 +21,6 @@
   },
   "n_channels": 16,
   "n_stimuli": 30,
-  "n_PCA_components": 3
+  "n_PCA_components": 3,
+  "IFR_bin_duration": 0.05
 }
