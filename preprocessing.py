@@ -42,22 +42,28 @@ raw_data_paths = preprocessing.get_raw_data_paths(group, subject, conditions, ar
 if not os.path.isdir(output_dir):
     os.makedirs(output_dir)
 
-output_dir = os.path.join(output_dir, group, subject)
-if os.path.isdir(output_dir):
-    shutil.rmtree(output_dir)
-os.makedirs(output_dir)
+subject_dir = os.path.join(output_dir, group, subject)
+if os.path.isdir(subject_dir):
+    print('The ' + subject_dir + ' path already exists.')
+    ans = input('Do you want to delete all the content and execute a new preprocessing? (y/[n])\n')
+    if ans == 'y':
+        shutil.rmtree(subject_dir)
+    else:
+        print('Abort.')
+        exit()
+os.makedirs(subject_dir)
 
-for condition_idx in tqdm(np.arange(np.size(conditions)), desc='Conditions'):
-    condition = conditions[condition_idx]
+for conditions_idx in tqdm(np.arange(np.size(conditions)), desc='Conditions'):
+    condition = conditions[conditions_idx]
 
     # Get stimulus idxs for the considered condition
     stimulus_idxs_matrix = preprocessing.get_stimulus_idxs_matrix(raw_data_paths, condition, settings)
     stimulus_idxs = preprocessing.get_median_stimulus_idxs(stimulus_idxs_matrix, tolerance_duration=0.1, settings=settings)
 
-    for area_idx in tqdm(np.arange(np.size(areas)), desc='Brain Areas', leave=False):
-        area = areas[area_idx]
+    for areas_idx in tqdm(np.arange(np.size(areas)), desc='Brain Areas', leave=False):
+        area = areas[areas_idx]
 
-        output_path = os.path.join(output_dir, condition, area)
+        output_path = os.path.join(subject_dir, condition, area)
         if os.path.isdir(output_path):
             shutil.rmtree(output_path)
 
@@ -84,7 +90,7 @@ for condition_idx in tqdm(np.arange(np.size(conditions)), desc='Conditions'):
             # Get spike train and divide it in trials
             spike_train = ns.utils.convert_spikes_idxs_to_spike_train(spikes_idxs, sampling_time=sampling_time)
             spike_train_trials = preprocessing.shape_trials(spike_train, stimulus_idxs, trial_duration, sampling_time)
-            spike_trains[condition_idx][area_idx][channel] = spike_train_trials
+            spike_trains[conditions_idx][areas_idx][channel] = spike_train_trials
 
             # Get Istantaneous Firing Rate (IFR)
             IFR, bin_samples = preprocessing.get_IFR(spike_train, bin_duration=0.05, sampling_time=sampling_time)
@@ -100,9 +106,9 @@ for condition_idx in tqdm(np.arange(np.size(conditions)), desc='Conditions'):
 
             # Get IFR trials
             IFR_trials = preprocessing.shape_trials(IFR, resampled_stimulus_idxs, trial_duration, sampling_time=resampling_time)
-            preprocessed_data[condition_idx][area_idx][channel] = IFR_trials
+            preprocessed_data[conditions_idx][areas_idx][channel] = IFR_trials
             
 
 print('Saving ...')
-savemat(os.path.join(output_dir, subject + '.mat'), {'spike_trains': spike_trains, 'data': preprocessed_data})
+savemat(os.path.join(subject_dir, subject + '.mat'), {'spike_trains': spike_trains, 'data': preprocessed_data})
 print('Done.')
