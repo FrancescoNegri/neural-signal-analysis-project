@@ -4,13 +4,17 @@ import numpy as np
 import neurospyke as ns
 from scipy.io import loadmat
 from tqdm import tqdm
+import utils
 
 f = open('settings.json')
 settings = json.load(f)
 f.close()
 
-sampling_frequency = settings['resampling_frequency']
+sampling_frequency = settings['sampling_frequency']
 sampling_time = 1 / sampling_frequency
+
+resampling_frequency = settings['resampling_frequency']
+resampling_time = 1 / resampling_frequency
 
 trial_duration = settings['trial_duration_view']
 trial_samples = np.floor(trial_duration * sampling_frequency).astype(np.int_)
@@ -42,10 +46,12 @@ else:
 
         for areas_idx in tqdm(np.arange(np.size(areas)), desc='Areas', leave=False):
             area = areas[areas_idx]
-            subject_info = group + '_' + subject + '_' + condition.split('_')[0] + '_' + area
-            raster_plot_filename = 'Raster_Plot_' + subject_info
-            raster_plot_title = 'Stimulus-Related Raster Plot\n' + subject_info
+            subject_information = utils.get_subject_information(group, subject, condition, area)
+            raster_plot_filename = 'Raster_Plot_' + subject_information
+            raster_plot_title = 'Stimulus-Related Raster Plot\n' + subject_information
 
             ns.visualization.plot_raster(spike_trains[conditions_idx, areas_idx, :, :, 0:trial_samples], sampling_time=sampling_time, n_cols=4, is_train=True, figsize=[15, 15], title=raster_plot_title, xlim=[0, trial_duration*1.01])
             ns.visualization.pyplot.savefig(os.path.join(subject_dir, raster_plot_filename + '.png'))
             ns.visualization.pyplot.close()
+
+print('Done.')

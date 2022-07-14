@@ -10,6 +10,7 @@ from scipy.stats import median_abs_deviation
 from scipy.io import savemat
 from scipy.ndimage import gaussian_filter1d
 import preprocessing
+import utils
 
 f = open('settings.json')
 settings = json.load(f)
@@ -37,7 +38,7 @@ output_dir = './output'
 spike_trains = np.ndarray([np.size(conditions), np.size(areas), n_channels, n_stimuli, trial_duration * sampling_frequency])
 preprocessed_data = np.ndarray([np.size(conditions), np.size(areas), n_channels, n_stimuli, trial_duration * resampling_frequency])
 
-raw_data_paths = preprocessing.get_raw_data_paths(group, subject, conditions, areas)
+raw_data_paths = utils.get_raw_data_paths(group, subject, conditions, areas)
 
 if not os.path.isdir(output_dir):
     os.makedirs(output_dir)
@@ -63,11 +64,11 @@ for conditions_idx in tqdm(np.arange(np.size(conditions)), desc='Conditions'):
     for areas_idx in tqdm(np.arange(np.size(areas)), desc='Brain Areas', leave=False):
         area = areas[areas_idx]
 
-        output_path = os.path.join(subject_dir, condition, area)
-        if os.path.isdir(output_path):
-            shutil.rmtree(output_path)
+        # output_path = os.path.join(subject_dir, condition, area)
+        # if os.path.isdir(output_path):
+        #     shutil.rmtree(output_path)
 
-        os.makedirs(output_path)
+        # os.makedirs(output_path)
         
         for channel_path in tqdm(raw_data_paths[condition][area], desc='Channels', leave=False):
             channel = int(channel_path.split('\\')[-1].split('_Ch_')[-1].split('.mat')[0])

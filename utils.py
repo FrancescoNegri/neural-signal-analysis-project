@@ -16,4 +16,14 @@ def get_raw_data_paths(group, subject, conditions, areas):
             raw_data_paths[condition][area] = [file for file in files if file.split('\\')[-1].find('_' + area + '_') != -1 ]
 
     return raw_data_paths
-   
+
+def get_subject_information(group, subject, condition, area=None, channel=None):
+    subject_information = group + '_' + subject + '_' + condition.split('_')[0]
+
+    if area is not None:
+        subject_information = subject_information + '_' + area
+
+    if channel is not None:
+        subject_information = subject_information + '_Ch' + str(channel)
+
+    return subject_information
