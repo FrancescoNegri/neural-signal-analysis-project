@@ -17,8 +17,11 @@ def get_raw_data_paths(group, subject, conditions, areas):
 
     return raw_data_paths
 
-def get_subject_information(group, subject, condition, area=None, channel=None):
-    subject_information = group + '_' + subject + '_' + condition.split('_')[0]
+def get_subject_information(group, subject, condition=None, area=None, channel=None):
+    subject_information = group + '_' + subject
+
+    if condition is not None:
+        subject_information = subject_information + '_' + condition.split('_')[0]
 
     if area is not None:
         subject_information = subject_information + '_' + area
