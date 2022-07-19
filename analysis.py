@@ -40,6 +40,7 @@ elif not os.path.isdir(subject_dir):
 elif not os.path.isfile(subject_data):
     raise Exception('No ' + subject + '.mat' + ' file found in ' + subject_dir)
 else:
+    print('Analyzed subject:', subject)
     data = loadmat(subject_data)
     spike_trains = data['spike_trains']
 
